@@ -14,6 +14,7 @@ button_pressed = False
 def handle_frame(frame):
     if(button_pressed):
         save_img()
+    return frame
 
 def save_img():
     img = Image.fromarray(frame).convert("RGBA")
@@ -38,6 +39,28 @@ atexit.register(enable_fb_console)
 signal.signal(signal.SIGINT, lambda s, f: exit(0))
 
 disable_fb_console()
+
+
+# -----------------------------
+# Graphics
+# -----------------------------
+def pil_to_fb_bytes(img: Image.Image, width: int, height: int, bpp: int) -> bytes:
+    """把 PIL 图像转换为 framebuffer 的原始像素字节流"""
+    img = img.resize((width, height), Image.LANCZOS)
+
+    if bpp == 32:
+        # framebuffer 是 BGRA 排列
+        return img.convert("RGBA").tobytes("raw", "BGRA")
+    elif bpp == 16:
+        # RGB565 模式（少见，但支持）
+        arr = np.array(img.convert("RGB"), dtype=np.uint8)
+        r = (arr[..., 0] >> 3).astype(np.uint16)
+        g = (arr[..., 1] >> 2).astype(np.uint16)
+        b = (arr[..., 2] >> 3).astype(np.uint16)
+        rgb565 = (r << 11) | (g << 5) | b
+        return rgb565.tobytes()
+    else:
+        raise ValueError(f"Unsupported framebuffer bpp: {bpp}")
 
 # -----------------------------
 # MAIN
