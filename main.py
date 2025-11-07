@@ -12,18 +12,22 @@ import RPi.GPIO as GPIO
 button_pressed = False
 
 def handle_frame(frame):
-    if(button_pressed):
-        save_img()
+    #if(button_pressed):
+    if True:
+        print("save image");
+        save_img(frame)
     return frame
 
-def save_img():
-    img = Image.fromarray(frame).convert("RGBA")
-    img.save('frame.png')
-    #img.save('frame.jpg') # without A channel
+def save_img(frame):
+    #img = Image.fromarray(frame).convert("RGBA")
+    #img.save('frame.png')
+    img = Image.fromarray(frame).convert("RGB")
+    img.save('frame.jpg') # without A channel
 
 
 def button_callback(channel):
     button_pressed = True
+    print("button pressed");
 
 
 # -----------------------------
@@ -70,6 +74,7 @@ def main():
     # init gpio
     GPIO.setmode(GPIO.BCM)
     BUTTON_PIN = 29
+    BUTTON_PIN = 21
     GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
     GPIO.add_event_detect(BUTTON_PIN, GPIO.FALLING, 
@@ -116,6 +121,7 @@ def main():
                 print(f"{frames} FPS")
                 frames = 0
                 t0 = now
+            break
 
     except KeyboardInterrupt:
         print("\nexiting...")
