@@ -14,23 +14,27 @@ import render
 
 button_pressed = False
 font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+msg = ""
 
-def handle_frame(frame):
+def handle_frame(img):
     #if(button_pressed):
     if True:
         print("save image");
-        save_img(frame)
-        #msg = api.request()
+        #save_img(img)
+        msg = api.request()
+        os.system(f"mpg321 audio.mp3") # play sound
         msg = "The CN Tower, standing at 553.33 meters (1,815 feet, 5 inches), is an iconic communications and observation tower in downtown Toronto, Canada. Completed in 1976, it was the world's tallest free-standing structure for over 30 years and remains the tallest in the Western Hemisphere"
         if render.scroller is None:
-            render.scroller = render.setup_scroller(frame, msg, font_path)
-    return frame
+            render.scroller = render.setup_scroller(img, msg, font_path)
+    if render.sroller is not None:
+        rendered_frame = render.scroller.render_frame()
+    return rendered_frame 
 
-def save_img(frame):
+def save_img(img):
     #img = Image.fromarray(frame).convert("RGBA")
-    #img.save('frame.png')
-    img = Image.fromarray(frame).convert("RGB")
-    img.save('frame.jpg') # without A channel
+    img.save('frame.png')
+    #img = Image.fromarray(frame).convert("RGB")
+    #img.save('frame.jpg') # without A channel
 
 
 def button_callback(channel):
@@ -114,9 +118,9 @@ def main():
         while True:
             frame = picam.capture_array()
 
-            frame = handle_frame(frame)
-
             img = Image.fromarray(frame).convert("RGBA")
+            img = handle_frame(img)
+
             raw = pil_to_fb_bytes(img, fb_width, fb_height, fb_bpp)
 
             fb_map.seek(0)
