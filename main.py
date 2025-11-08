@@ -20,14 +20,15 @@ def handle_frame(img):
     #if(button_pressed):
     if True:
         print("save image");
-        #save_img(img)
+        save_img(img)
         msg = api.request()
         os.system(f"mpg321 audio.mp3") # play sound
-        msg = "The CN Tower, standing at 553.33 meters (1,815 feet, 5 inches), is an iconic communications and observation tower in downtown Toronto, Canada. Completed in 1976, it was the world's tallest free-standing structure for over 30 years and remains the tallest in the Western Hemisphere"
         if render.scroller is None:
             render.scroller = render.setup_scroller(img, msg, font_path)
-    if render.sroller is not None:
+    if render.scroller is not None:
         rendered_frame = render.scroller.render_frame()
+    else:
+        rendered_frame = img
     return rendered_frame 
 
 def save_img(img):
