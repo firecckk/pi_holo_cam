@@ -9,13 +9,21 @@ from PIL import Image, ImageDraw, ImageFont
 from picamera2 import Picamera2
 import RPi.GPIO as GPIO
 
+import api
+import render
+
 button_pressed = False
+font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 
 def handle_frame(frame):
     #if(button_pressed):
     if True:
         print("save image");
         save_img(frame)
+        #msg = api.request()
+        msg = "The CN Tower, standing at 553.33 meters (1,815 feet, 5 inches), is an iconic communications and observation tower in downtown Toronto, Canada. Completed in 1976, it was the world's tallest free-standing structure for over 30 years and remains the tallest in the Western Hemisphere"
+        if render.scroller is None:
+            render.scroller = render.setup_scroller(frame, msg, font_path)
     return frame
 
 def save_img(frame):
@@ -27,7 +35,7 @@ def save_img(frame):
 
 def button_callback(channel):
     button_pressed = True
-    print("button pressed");
+    print("button pressed")
 
 
 # -----------------------------
