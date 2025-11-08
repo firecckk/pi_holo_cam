@@ -35,6 +35,20 @@ def request():
             }
         ]
     )
-    return(response.choices[0].message.content)
+
+    # text to sound
+    reply_text=response.choices[0].message.content
+    speech_response = client.audio.speech.create(
+    model="gpt-4o-mini-tts",
+    voice="alloy",
+    input=reply_text
+    )
+
+    # save audio
+    audio_path = "audio.mp3"
+    with open(audio_path, "wb") as f:
+        f.write(speech_response.read())
+
+    return(reply_text)
 
 
