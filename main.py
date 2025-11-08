@@ -1,4 +1,5 @@
 import os
+import threading
 import time
 import mmap
 import signal
@@ -12,24 +13,34 @@ import RPi.GPIO as GPIO
 import api
 import render
 
-button_pressed = False
+button_pressed = False 
+async_task_lock = threading.Lock() 
 font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 msg = ""
 
 def handle_frame(img):
-    #if(button_pressed):
-    if True:
-        print("save image");
+    global button_pressed
+    if(button_pressed):
+        button_pressed = False
         save_img(img)
-        msg = api.request()
-        os.system(f"mpg321 audio.mp3") # play sound
-        if render.scroller is None:
-            render.scroller = render.setup_scroller(img, msg, font_path)
+        if async_task_lock.acquire(blocking=False):
+            threading.Thread(target=async_task, args=(), daemon=True).start()
     if render.scroller is not None:
-        rendered_frame = render.scroller.render_frame()
+        rendered_frame = render.scroller.render_frame(img)
     else:
         rendered_frame = img
     return rendered_frame 
+
+def async_task():
+    try:
+        #msg = api.request()
+        msg = "The CN Tower, standing at 553.33 meters (1,815 feet, 5 inches), is an iconic communications and observation tower in downtown Toronto, Canada. Completed in 1976, it was the world's tallest free-standing structure for over 30 years and remains the tallest in the Western Hemisphere"
+        os.system(f"mpg321 audio.mp3") # play sound
+        render.scroller = render.setup_scroller(msg, font_path)
+    except Exception as e:
+        print("thread error", e)
+    finally:
+        async_task_lock.release()
 
 def save_img(img):
     #img = Image.fromarray(frame).convert("RGBA")
@@ -39,8 +50,11 @@ def save_img(img):
 
 
 def button_callback(channel):
+    global button_pressed
     button_pressed = True
     print("button pressed")
+
+button_callback(1) # TEST simulate button press
 
 
 # -----------------------------
@@ -134,7 +148,6 @@ def main():
                 print(f"{frames} FPS")
                 frames = 0
                 t0 = now
-            break
 
     except KeyboardInterrupt:
         print("\nexiting...")

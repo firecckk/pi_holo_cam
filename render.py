@@ -34,13 +34,12 @@ def wrap_text(text, font, max_width):
     return lines
 
 class TextScroller:
-    def __init__(self, background_image, text, font_path, font_size=30, 
+    def __init__(self, width, height, text, font_path, font_size=30, 
                  text_color=(255, 255, 255), margin=50, scroll_speed=2):
         """
         初始化文本滚动器
         
         参数:
-            background_image: 背景图片路径或PIL Image对象
             text: 要滚动的长文本
             font_path: 字体文件路径
             font_size: 字体大小
@@ -48,11 +47,8 @@ class TextScroller:
             margin: 边距
             scroll_speed: 滚动速度(像素/帧)
         """
-        if isinstance(background_image, str):
-            self.background = Image.open(background_image).convert('RGB')
-        else:
-            self.background = background_image.convert('RGB')
-        
+        self.width = width
+        self.height = height
         self.text = text
         self.font = ImageFont.truetype(font_path, font_size)
         self.text_color = text_color
@@ -60,7 +56,7 @@ class TextScroller:
         self.scroll_speed = scroll_speed
         
         # 计算可用的文本宽度
-        self.max_width = self.background.width - 2 * margin
+        self.max_width = self.width - 2 * margin
         
         # 文本换行处理
         self.lines = wrap_text(text, self.font, self.max_width)
@@ -73,18 +69,17 @@ class TextScroller:
         self.total_text_height = len(self.lines) * self.line_height
         
         # 初始化滚动位置（从屏幕底部开始）
-        self.current_y = self.background.height
+        self.current_y = self.height
         
-    def render_frame(self):
+    def render_frame(self, pil_frame):
         """渲染当前帧"""
         # 创建背景副本
-        frame = self.background.copy()
-        draw = ImageDraw.Draw(frame)
+        draw = ImageDraw.Draw(pil_frame)
         
         # 计算当前可见的行
-        start_index = max(0, int((self.background.height - self.current_y) / self.line_height) - 1)
+        start_index = max(0, int((self.height - self.current_y) / self.line_height) - 1)
         end_index = min(len(self.lines), 
-                       start_index + int(self.background.height / self.line_height) + 2)
+                       start_index + int(self.height / self.line_height) + 2)
         
         # 绘制可见行
         for i in range(start_index, end_index):
@@ -98,13 +93,13 @@ class TextScroller:
             # 计算文本位置（水平居中）
             bbox = draw.textbbox((0, 0), line, font=self.font) if hasattr(draw, 'textbbox') else draw.textsize(line, font=self.font)
             text_width = bbox[2] - bbox[0] if hasattr(draw, 'textbbox') else bbox[0]
-            x = (self.background.width - text_width) // 2
+            x = (self.width - text_width) // 2
             
             # 垂直位置
             y = self.current_y + i * self.line_height
             
             # 只在可见区域内绘制
-            if -self.line_height < y < self.background.height + self.line_height:
+            if -self.line_height < y < self.height + self.line_height:
                 # 添加文字阴影效果增强可读性
                 shadow_color = (0, 0, 0)
                 draw.text((x+1, y+1), line, font=self.font, fill=shadow_color)
@@ -114,16 +109,17 @@ class TextScroller:
         self.current_y -= self.scroll_speed
         
         # 检查是否滚动完成，完成后重置位置
-        if self.current_y + self.total_text_height < -self.background.height:
-            self.current_y = self.background.height
+        if self.current_y + self.total_text_height < -self.height:
+            self.current_y = self.height
         
-        return frame
+        return pil_frame
 
 # 使用示例
-def setup_scroller(background_path, text, font_path):
+def setup_scroller(text, font_path):
     """初始化滚动文本"""
     return TextScroller(
-        background_image=background_path,
+        width=800,
+        height=480,
         text=text,
         font_path=font_path,
         font_size=24,

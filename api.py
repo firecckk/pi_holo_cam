@@ -8,7 +8,8 @@ import config
 client = OpenAI(api_key=config.API_KEY)
 
 def request():
-    img = Image.open("frame.jpg").convert("RGB")
+    #img = Image.open("frame.jpg").convert("RGB")
+    img = Image.open("frame.png").convert("RGB")
     img = img.resize((512, 512))
 
     # To base64
