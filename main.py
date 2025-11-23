@@ -109,8 +109,10 @@ def main():
     fb_map = mmap.mmap(fb_fd, fb_size, mmap.MAP_SHARED, mmap.PROT_WRITE)
 
     # init cam
+    camera_width = 1600
+    camera_height = 960
     picam = Picamera2()
-    config = picam.create_video_configuration(main={"size": (fb_width, fb_height)})
+    config = picam.create_video_configuration(main={"size": (camera_width, camera_height)})
     picam.configure(config)
     picam.start()
 
@@ -125,6 +127,8 @@ def main():
 
             img = Image.fromarray(frame).convert("RGBA")
             img = handle_frame(img)
+
+            img = img.resize((800, 480), Image.LANCZOS)
 
             raw = pil_to_fb_bytes(img, fb_width, fb_height, fb_bpp)
 
