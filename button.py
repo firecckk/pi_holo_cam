@@ -15,4 +15,4 @@ def gpio_button_init(button_callback):
 
         GPIO.add_event_detect(pin, GPIO.FALLING, 
                          callback=button_callback, 
-                         bouncetime=60)
+                         bouncetime=100)

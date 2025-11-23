@@ -52,7 +52,7 @@ def save_img(img):
 def button_callback(channel):
     global button_pressed
     #button_pressed = True
-    print("button pressed")
+    print("button pressed: ", channel)
 
 # -----------------------------
 # Disable TTY
@@ -96,7 +96,7 @@ def pil_to_fb_bytes(img: Image.Image, width: int, height: int, bpp: int) -> byte
 
 def main():
     # init button
-    gpio_button_init(button_callback)
+    button.gpio_button_init(button_callback)
 
     # init fb
     fb_width=800
