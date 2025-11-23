@@ -8,10 +8,10 @@ import subprocess
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from picamera2 import Picamera2
-import RPi.GPIO as GPIO
 
 import api
 import render
+import button
 
 button_pressed = False 
 async_task_lock = threading.Lock() 
@@ -51,11 +51,8 @@ def save_img(img):
 
 def button_callback(channel):
     global button_pressed
-    button_pressed = True
+    #button_pressed = True
     print("button pressed")
-
-button_callback(1) # TEST simulate button press
-
 
 # -----------------------------
 # Disable TTY
@@ -98,15 +95,8 @@ def pil_to_fb_bytes(img: Image.Image, width: int, height: int, bpp: int) -> byte
 # -----------------------------
 
 def main():
-    # init gpio
-    GPIO.setmode(GPIO.BCM)
-    BUTTON_PIN = 29
-    BUTTON_PIN = 21
-    GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-    GPIO.add_event_detect(BUTTON_PIN, GPIO.FALLING, 
-                         callback=button_callback, 
-                         bouncetime=300)
+    # init button
+    gpio_button_init(button_callback)
 
     # init fb
     fb_width=800
