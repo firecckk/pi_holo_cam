@@ -26,7 +26,7 @@ def handle_client(conn, addr, input_listener):
                 break
             
             message = data.decode('utf-8').strip()
-            print(f"⬅️ 接收自 {addr}: {message!r}")
+            #print(f"⬅️ 接收自 {addr}: {message!r}")
 
             lines = message.split('\n')
             for line in lines:

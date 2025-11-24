@@ -79,6 +79,8 @@ class AnimatedStackedWidget(QStackedWidget):
         old_widget.setGeometry(self.rect())
 
 # ----------------- 主应用窗口类 (路径处理、美化和按键切换) -----------------
+from .page_blank import BlankPage
+from .page_map import MapPage
 
 class MainApplication(QMainWindow):
     def __init__(self):
@@ -149,10 +151,14 @@ class MainApplication(QMainWindow):
         self.stacked_widget = AnimatedStackedWidget()
         
         # 添加内容页面
-        for i, (name, _) in enumerate(items_data):
-            page = QLabel(f"这是 {name} 页面", alignment=Qt.AlignmentFlag.AlignCenter)
-            page.setStyleSheet(f"background-color: {'#000000'}; color: #34495E; font-size: 24px;")
+        pages = [MapPage(), BlankPage(), BlankPage()]
+        for page in pages:
             self.stacked_widget.addWidget(page)
+            
+        #for i, (name, _) in enumerate(items_data):
+        #    page = QLabel(f"这是 {name} 页面", alignment=Qt.AlignmentFlag.AlignCenter)
+        #    page.setStyleSheet(f"background-color: {'#000000'}; color: #34495E; font-size: 24px;")
+        #    self.stacked_widget.addWidget(page)
             
         # 关联菜单点击事件和页面切换
         self.menu_list.currentRowChanged.connect(self.stacked_widget.setCurrentIndex)
