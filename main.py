@@ -12,6 +12,7 @@ from picamera2 import Picamera2
 import api
 import render
 import button
+import tcp_button_listener
 
 button_pressed = False 
 async_task_lock = threading.Lock() 
@@ -97,6 +98,7 @@ def pil_to_fb_bytes(img: Image.Image, width: int, height: int, bpp: int) -> byte
 def main():
     # init button
     button.gpio_button_init(button_callback)
+    tcp_button_listener.start_server()
 
     # init fb
     fb_width=800
