@@ -202,10 +202,11 @@ class MainApplication(QMainWindow):
         # 调用父类的 keyPressEvent 以处理其他默认按键行为
         super().keyPressEvent(event)
 
-def run():
+def run(input_listener):
     app = QApplication(sys.argv)
     app.setOverrideCursor(QCursor(Qt.CursorShape.BlankCursor))
     window = MainApplication()
+    input_listener.key_pressed.connect(window._handle_input_key)
     window.show()
     window.resize(480, 320)
     print("window: ", window.width(), " ", window.height())

@@ -24,4 +24,4 @@ if __name__ == "__main__":
     input_listener = InputListener.InputListener()
     tcp_button.thread_run(input_listener)
     gpio_button.gpio_button_init(input_listener)
-    gui.run()
+    gui.run(input_listener)
