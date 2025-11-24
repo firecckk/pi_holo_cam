@@ -1,3 +1,4 @@
+import os
 import atexit
 import signal
 import qt.gui as gui
@@ -21,6 +22,6 @@ disable_fb_console()
 
 if __name__ == "__main__":
     input_listener = InputListener.InputListener()
-    tcp_button.start_tcp_server(input_listener)
+    tcp_button.thread_run(input_listener)
     gpio_button.gpio_button_init(input_listener)
     gui.run()
