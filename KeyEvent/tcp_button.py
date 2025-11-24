@@ -12,9 +12,9 @@ PATTERN = re.compile(r'BUTTON:code=(\d+),action=PRESS')
 
 # 按键码映射（从数字映射到 Qt.Key）
 CODE_TO_KEY = {
-    '7': Qt.Key.Key_Up,
-    '9': Qt.Key.Key_Down,
-    '8': Qt.Key.Key_Return
+    '16': Qt.Key.Key_Up,
+    '20': Qt.Key.Key_Down,
+    '21': Qt.Key.Key_Return
 }
 
 def handle_client(conn, addr, input_listener):
