@@ -1,0 +1,18 @@
+import qt.gui as gui
+
+# -----------------------------
+# Disable TTY
+# -----------------------------
+def disable_fb_console():
+    os.system("echo 0 | sudo tee /sys/class/vtconsole/vtcon1/bind > /dev/null 2>&1")
+
+def enable_fb_console():
+    os.system("echo 1 | sudo tee /sys/class/vtconsole/vtcon1/bind > /dev/null 2>&1")
+
+atexit.register(enable_fb_console)
+signal.signal(signal.SIGINT, lambda s, f: exit(0))
+
+disable_fb_console()
+
+if __name__ == "__main__":
+    gui.run()

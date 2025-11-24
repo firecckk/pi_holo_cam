@@ -1,9 +1,8 @@
 thickness = 3;
 
-
 width = 120;
 
-bar_height = 100;
+bar_height = 80;
 bar_width = 10;
 
 $fn = 80;
@@ -30,8 +29,8 @@ union() {
     }
     
     // 中间竖柱
-    translate([width/2-bar_width/2, 0, 0]){
-        square([bar_width, bar_height]);
+    translate([width/2-bar_width, 0, 0]){
+        square([bar_width*2, bar_height]);
     }
     
     //延伸柱
@@ -63,6 +62,10 @@ union() {
     }
 
     }
+    
+    // 三角板
+    translate([40, 30, 0]) rotate([0, 0, 90]) pentagon();
+    translate([80, 30, 0]) rotate([0, 180, 270]) pentagon();
 }
 }
 
@@ -77,6 +80,20 @@ module screw_hole(diameter=3, length = 6) {
             }
         }
     }
+
+// 支撑三角板
+module pentagon() {
+    
+    translate([0, 0, 0]) {
+        square([60, bar_width]);
+    }
+    translate([70, 0, 0]) {
+        rotate([0, 0, 90]) square([40, bar_width]);
+    }
+    translate([70, 40, 0]) {
+        rotate([0, 0, 135]) square([40, bar_width]);
+    }
+}
 
 module 3d_shape() {
 linear_extrude(

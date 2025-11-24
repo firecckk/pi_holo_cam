@@ -47,7 +47,7 @@ def handle_client(conn, addr, button_callback):
                     
                     # 发送转换后的数字字节流
                     button_callback(code)
-                    print(f"➡️ {addr}: 转换按键 {code}")
+                    #print(f"➡️ {addr}: 转换按键 {code}")
                 
     except ConnectionResetError:
         print(f"⚠️ 客户端 {addr} 异常断开。")

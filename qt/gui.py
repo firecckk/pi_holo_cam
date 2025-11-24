@@ -80,20 +80,6 @@ class AnimatedStackedWidget(QStackedWidget):
         super().setCurrentIndex(final_index)
         old_widget.setGeometry(self.rect())
 
-# -----------------------------
-# Disable TTY
-# -----------------------------
-def disable_fb_console():
-    os.system("echo 0 | sudo tee /sys/class/vtconsole/vtcon1/bind > /dev/null 2>&1")
-
-def enable_fb_console():
-    os.system("echo 1 | sudo tee /sys/class/vtconsole/vtcon1/bind > /dev/null 2>&1")
-
-atexit.register(enable_fb_console)
-signal.signal(signal.SIGINT, lambda s, f: exit(0))
-
-disable_fb_console()
-
 # ----------------- 主应用窗口类 (路径处理、美化和按键切换) -----------------
 
 class MainApplication(QMainWindow):
@@ -211,7 +197,7 @@ class MainApplication(QMainWindow):
         super().keyPressEvent(event)
 
 
-if __name__ == "__main__":
+def run():
     app = QApplication(sys.argv)
     app.setOverrideCursor(QCursor(Qt.CursorShape.BlankCursor))
     window = MainApplication()
@@ -220,3 +206,6 @@ if __name__ == "__main__":
     #window.setFixedSize(800, 480)
     print("window: ", window.width(), " ", window.height())
     sys.exit(app.exec())
+
+if __name__ == "__main__":
+    run()
