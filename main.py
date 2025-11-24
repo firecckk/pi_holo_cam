@@ -98,7 +98,7 @@ def pil_to_fb_bytes(img: Image.Image, width: int, height: int, bpp: int) -> byte
 def main():
     # init button
     button.gpio_button_init(button_callback)
-    tcp_button_listener.start_server()
+    tcp_button_listener.start_server(button_callback)
 
     # init fb
     fb_width=800

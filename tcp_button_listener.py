@@ -16,7 +16,7 @@ def handle_client(conn, addr, button_callback):
     """
     处理单个客户端连接的函数
     """
-    print(f"✅ 客户端 {addr} 已连接。开始监听数据...")
+    #print(f"✅ 客户端 {addr} 已连接。开始监听数据...")
     
     try:
         while True:
@@ -55,7 +55,7 @@ def handle_client(conn, addr, button_callback):
         print(f"❌ 处理客户端 {addr} 时发生错误: {e}")
     finally:
         # 关闭连接
-        print(f"🔌 客户端 {addr} 连接已关闭。")
+        #print(f"🔌 客户端 {addr} 连接已关闭。")
         conn.close()
 
 def start_server(button_callback):
@@ -76,7 +76,6 @@ def start_server(button_callback):
         server_socket.listen(5)
         
         print(f"📡 TCP 服务器已启动，正在监听 {HOST}:{PORT}...")
-        print("请在另一个终端使用 'nc' 连接并发送数据。")
         
         while True:
             # 等待连接
