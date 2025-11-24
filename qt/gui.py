@@ -1,7 +1,5 @@
 import sys
 import os
-import atexit
-import signal
 from PyQt6.QtCore import (Qt, QPropertyAnimation, QRect, QEasingCurve, QSize)
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QHBoxLayout,
                              QListWidget, QListWidgetItem, QStackedWidget, 
@@ -167,6 +165,14 @@ class MainApplication(QMainWindow):
         # 确保 QMainWindow 接收按键事件，而不是 QListWidget
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
+    def _handle_input_key(self, key_code):
+        """将 GPIO/TCP 指令转换为 Qt 按键事件"""
+        event = QKeyEvent(
+            QKeyEvent.Type.KeyPress, 
+            key_code, 
+            Qt.KeyboardModifier.NoModifier
+        )
+        self.keyPressEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent):
         """
@@ -196,14 +202,12 @@ class MainApplication(QMainWindow):
         # 调用父类的 keyPressEvent 以处理其他默认按键行为
         super().keyPressEvent(event)
 
-
 def run():
     app = QApplication(sys.argv)
     app.setOverrideCursor(QCursor(Qt.CursorShape.BlankCursor))
     window = MainApplication()
     window.show()
     window.resize(480, 320)
-    #window.setFixedSize(800, 480)
     print("window: ", window.width(), " ", window.height())
     sys.exit(app.exec())
 

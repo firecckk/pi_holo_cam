@@ -1,4 +1,9 @@
+import atexit
+import signal
 import qt.gui as gui
+import qt.InputListener as InputListener
+import KeyEvent.gpio_button as gpio_button
+import KeyEvent.tcp_button as tcp_button
 
 # -----------------------------
 # Disable TTY
@@ -15,4 +20,7 @@ signal.signal(signal.SIGINT, lambda s, f: exit(0))
 disable_fb_console()
 
 if __name__ == "__main__":
+    input_listener = InputListener.InputListener()
+    tcp_button.start_tcp_server(input_listener)
+    gpio_button.gpio_button_init(input_listener)
     gui.run()
