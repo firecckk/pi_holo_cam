@@ -196,6 +196,11 @@ class MainApplication(QMainWindow):
         elif event.key() == Qt.Key.Key_Down:
             # 向下切换，使用 % 实现循环
             new_row = (current_row + 1) % total_rows
+        elif event.key() == Qt.Key.Key_Return:
+            # 在 Blank 页面按下 Enter 触发拍照与分析
+            current_page = self.stacked_widget.widget(current_row)
+            if isinstance(current_page, BlankPage):
+                current_page.capture_and_analyze()
             
         elif event.key() == Qt.Key.Key_Q:
             # 添加 Q 键作为退出应用的快捷键，方便调试
