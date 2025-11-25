@@ -20,6 +20,12 @@ signal.signal(signal.SIGINT, lambda s, f: exit(0))
 
 disable_fb_console()
 
+# -----------------------------
+# Config Camera
+# -----------------------------
+import camera
+camera.init_camera(real=True)
+
 if __name__ == "__main__":
     input_listener = InputListener.InputListener()
     tcp_button.thread_run(input_listener)

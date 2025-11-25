@@ -81,6 +81,7 @@ class AnimatedStackedWidget(QStackedWidget):
 # ----------------- 主应用窗口类 (路径处理、美化和按键切换) -----------------
 from .page_blank import BlankPage
 from .page_map import MapPage
+from .page_ai import CameraPage
 
 class MainApplication(QMainWindow):
     def __init__(self):
@@ -151,7 +152,7 @@ class MainApplication(QMainWindow):
         self.stacked_widget = AnimatedStackedWidget()
         
         # 添加内容页面
-        pages = [MapPage(), BlankPage(), BlankPage()]
+        pages = [MapPage(), CameraPage(), BlankPage()]
         for page in pages:
             self.stacked_widget.addWidget(page)
             
