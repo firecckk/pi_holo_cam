@@ -18,6 +18,7 @@ def init_camera(real = False):
     if real:
         from picamera2 import Picamera2
         import cv2
+        import numpy as np
         
         class Camera:
 
@@ -34,6 +35,13 @@ def init_camera(real = False):
                 frame_rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
                 frame_rgb = cv2.UMat(frame_rgb).get()  # 确保内存连续
                 return frame_rgb
+
+            def capture_raw(self):
+                """快速获取原始RGB帧（不进行额外颜色空间转换）。"""
+                frame = self.camera.capture_array()  # RGB
+                if not frame.flags['C_CONTIGUOUS']:
+                    frame = np.ascontiguousarray(frame)
+                return frame
         __camera = Camera()
     else:
         class MockCamera:
@@ -46,6 +54,10 @@ def init_camera(real = False):
 
             def capture_Image(self):
                 """返回固定的随机RGB数组"""
+                return self.mock_frame.copy()
+
+            def capture_raw(self):
+                """返回固定的随机RGB数组（快速路径）。"""
                 return self.mock_frame.copy()
         __camera = MockCamera()
     __camera_inited = True
