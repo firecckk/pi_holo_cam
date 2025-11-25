@@ -22,7 +22,9 @@ class BlankPage(QLabel):
 
         def _worker():
             try:
-                frame_rgb = camera.get_camera().capture_Image()
+                # Use fast path: no extra color conversions
+                cam = camera.get_camera()
+                frame_rgb = cam.capture_raw()
                 desc = ai_client.analyze_frame(frame_rgb)
                 QTimer.singleShot(0, lambda: self._apply_result(desc))
             except Exception as e:
