@@ -16,9 +16,10 @@ def get_camera():
 def init_camera(real = False):
     global __camera, __camera_inited
     if real:
+        from picamera2 import Picamera2
+        import cv2
+        
         class Camera:
-            from picamera2 import Picamera2
-            import cv2
 
             def __init__(self):
                 self.camera = Picamera2()
