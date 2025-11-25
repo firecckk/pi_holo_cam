@@ -1,0 +1,59 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          pi_holo_cam
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Description:       Pi Hologram Camera Service
+### END INIT INFO
+
+export PATH="${PATH:+$PATH:}/home/pi/github/pi_holo_cam"
+PIDFILE="/var/run/pi_holo_cam.pid"
+DAEMON="bash"
+DAEMON_OPTS="run.sh"
+
+case "$1" in
+    start)
+        if [ -f "$PIDFILE" ]; then
+            echo "Service is already running (PID file exists)"
+            exit 1
+        fi
+        echo "Starting pi_holo_cam..."
+        $DAEMON $DAEMON_OPTS > /dev/null 2>&1 &
+        echo $! > "$PIDFILE"
+        ;;
+    stop)
+        if [ -f "$PIDFILE" ]; then
+            echo "Stopping pi_holo_cam..."
+            PID=$(cat "$PIDFILE")
+            kill $PID
+            rm -f "$PIDFILE"
+        else
+            echo "PID file not found - trying pkill..."
+            pkill -f "python3.*pi_holo_cam" 2>/dev/null
+        fi
+        ;;
+    restart)
+        $0 stop
+        sleep 2
+        $0 start
+        ;;
+    status)
+        if [ -f "$PIDFILE" ]; then
+            PID=$(cat "$PIDFILE")
+            if kill -0 $PID 2>/dev/null; then
+                echo "pi_holo_cam is running (PID: $PID)"
+            else
+                echo "pi_holo_cam PID file exists but process not found"
+                rm -f "$PIDFILE"
+            fi
+        else
+            echo "pi_holo_cam is not running"
+        fi
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+        ;;
+esac

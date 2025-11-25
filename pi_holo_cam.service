@@ -1,0 +1,16 @@
+[Unit]
+Description=Pi Hologram Camera Service
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/github/pi_holo_cam
+Environment=PATH=/usr/local/bin:/usr/bin:/bin:/home/pi/github/pi_holo_cam
+ExecStart=/bin/bash run.sh
+ExecStop=/usr/bin/pkill -f "python3.*run.sh"
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
