@@ -129,9 +129,8 @@ class MainApplication(QMainWindow):
 
         items_data = [
             ("Map", "map.png"), 
-            ("状态", "ai.png"),
-            ("维护", "set.png")
-            #("关于", "about.png")
+            ("AI", "ai.png"),
+            ("Cam", "cam.png")
         ]
         
         for name, icon_file in items_data:
