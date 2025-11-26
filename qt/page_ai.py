@@ -6,7 +6,7 @@ import camera
 import ai_client
 
 
-class BlankPage(QLabel):
+class AIPage(QLabel):
     # Signal to deliver analysis result back to UI thread
     result_ready = pyqtSignal(str)
     def __init__(self):

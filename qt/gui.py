@@ -79,7 +79,7 @@ class AnimatedStackedWidget(QStackedWidget):
         old_widget.setGeometry(self.rect())
 
 # ----------------- 主应用窗口类 (路径处理、美化和按键切换) -----------------
-from .page_blank import BlankPage
+from .page_ai import AIPage
 from .page_map import MapPage
 from .page_camera import CameraPage
 
@@ -152,7 +152,7 @@ class MainApplication(QMainWindow):
         self.stacked_widget = AnimatedStackedWidget()
         
         # 添加内容页面
-        pages = [MapPage(), BlankPage(), CameraPage()]
+        pages = [MapPage(), AIPage(), CameraPage()]
         for page in pages:
             self.stacked_widget.addWidget(page)
             
@@ -199,7 +199,7 @@ class MainApplication(QMainWindow):
         elif event.key() == Qt.Key.Key_Return:
             # 在 Blank 页面按下 Enter 触发拍照与分析
             current_page = self.stacked_widget.widget(current_row)
-            if isinstance(current_page, BlankPage):
+            if isinstance(current_page, AIPage):
                 current_page.capture_and_analyze()
             
         elif event.key() == Qt.Key.Key_Q:
