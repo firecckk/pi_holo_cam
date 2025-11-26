@@ -2,7 +2,7 @@ import os
 import base64
 import io
 from typing import Optional
-
+import time
 from PIL import Image
 
 # OpenAI Python SDK
@@ -24,12 +24,19 @@ _client = None  # lazily initialized OpenAI client instance
 def _get_client():
     global _client
     if _client is not None:
+        print("_client is none")
+        time.sleep(0.7)
         return _client
     if OpenAI is None:
+        print("OpenAI package not available")
+        time.sleep(0.7)
         raise RuntimeError("openai package not installed. Please `pip install openai`. ")
     if not API_KEY:
+        print("API_KEY is missing")
+        time.sleep(0.7)
         raise RuntimeError("Missing OpenAI API key. Set in config.API_KEY or env OPENAI_API_KEY.")
-    _client = OpenAI(api_key=API_KEY)
+    # Add a network/request timeout to avoid indefinite hangs
+    _client = OpenAI(api_key=API_KEY, timeout=10)
     return _client
 
 
@@ -39,7 +46,6 @@ def analyze_frame(frame_rgb) -> str:
     - frame_rgb: numpy array in RGB shape (H, W, 3), dtype=uint8
     """
     client = _get_client()
-
     # Convert numpy RGB to JPEG base64 (resize to 512x512 for cost/speed)
     img = Image.fromarray(frame_rgb).convert("RGB")
     img = img.resize((512, 512))
