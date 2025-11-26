@@ -1,9 +1,5 @@
 import os
 import numpy
-try:
-    from PIL import Image
-except Exception:
-    Image = None
 
 width = 320
 height = 320
@@ -49,6 +45,7 @@ def init_camera(real = False):
                 return frame
         __camera = Camera()
     else:
+        from PIL import Image
         # Hardcoded mock image path
         mock_path = r".\MockCam\test1.png"
         

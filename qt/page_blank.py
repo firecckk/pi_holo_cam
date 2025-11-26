@@ -3,7 +3,7 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 import threading
 
 import camera
-from . import ai_client
+import ai_client
 
 
 class BlankPage(QLabel):
