@@ -18,6 +18,7 @@ def init_camera(real = False):
     global __camera, __camera_inited
     if real:
         from picamera2 import Picamera2
+        from libcamera import Transform
         import cv2
         import numpy as np
         
@@ -25,7 +26,9 @@ def init_camera(real = False):
 
             def __init__(self):
                 self.camera = Picamera2()
-                config = self.camera.create_video_configuration(main={"size": (width, height)})
+                config = self.camera.create_video_configuration(
+                        main={"size": (width, height)},
+                        transform=Transform(hflip=True, vflip=True))
                 self.camera.configure(config)
                 self.camera.start()
 
