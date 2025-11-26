@@ -1,4 +1,9 @@
+import os
 import numpy
+try:
+    from PIL import Image
+except Exception:
+    Image = None
 
 width = 320
 height = 320
@@ -44,13 +49,28 @@ def init_camera(real = False):
                 return frame
         __camera = Camera()
     else:
+        # Hardcoded mock image path
+        mock_path = r".\MockCam\test1.png"
+        
         class MockCamera:
-            def __init__(self, width=480, height=320):
+            def __init__(self, width=320, height=320):
                 self.width = width
                 self.height = height
-                # 生成一个固定的随机数组（作为"固定"的模拟图像）
-                numpy.random.seed(42)
-                self.mock_frame = numpy.random.randint(0, 256, (height, width, 3), dtype=numpy.uint8)
+                # Try to load hardcoded mock image, fallback to random
+                if Image is not None and os.path.isfile(mock_path):
+                    try:
+                        img = Image.open(mock_path).convert("RGB")
+                        img = img.resize((self.width, self.height))
+                        self.mock_frame = numpy.array(img, dtype=numpy.uint8)
+                        print(f"MockCamera: loaded mock image from {mock_path}")
+                    except Exception as e:
+                        print(f"MockCamera: failed to load, using random: {e}")
+                        numpy.random.seed(42)
+                        self.mock_frame = numpy.random.randint(0, 256, (height, width, 3), dtype=numpy.uint8)
+                else:
+                    # Fallback to random noise
+                    numpy.random.seed(42)
+                    self.mock_frame = numpy.random.randint(0, 256, (height, width, 3), dtype=numpy.uint8)
 
             def capture_Image(self):
                 """返回固定的随机RGB数组"""
@@ -61,3 +81,12 @@ def init_camera(real = False):
                 return self.mock_frame.copy()
         __camera = MockCamera()
     __camera_inited = True
+
+def set_mock_image(path: str):
+    """Set a file path to use as the mock camera image in PC simulation.
+
+    - Call before first access to `get_camera()` or `init_camera(False)`.
+    - Alternatively, set environment `CAMERA_MOCK_IMAGE`.
+    """
+    global __mock_image_path
+    __mock_image_path = path
