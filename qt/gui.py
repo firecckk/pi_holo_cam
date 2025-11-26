@@ -214,44 +214,48 @@ class MainApplication(QMainWindow):
         # 调用父类的 keyPressEvent 以处理其他默认按键行为
         super().keyPressEvent(event)
 
-def run(input_listener):
+def run(input_listener, DEBUG_MODE=False):
     app = QApplication(sys.argv)
     app.setOverrideCursor(QCursor(Qt.CursorShape.BlankCursor))
     window = MainApplication()
-    
-    # Apply horizontal mirror by wrapping in a graphics view
-    # Get the original central widget and remove it temporarily
-    original_central = window.takeCentralWidget()
-    
-    # Create graphics scene and proxy
-    scene = QGraphicsScene()
-    proxy = QGraphicsProxyWidget()
-    proxy.setWidget(original_central)
-    
-    # Apply horizontal flip transform with proper origin
-    transform = QTransform()
-    transform.translate(480, 0)  # Move to right edge first
-    transform.scale(-1, 1)       # Then flip horizontally
-    proxy.setTransform(transform)
-    
-    scene.addItem(proxy)
-    
-    # Create view and set as new central widget
-    view = QGraphicsView(scene)
-    view.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-    view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-    view.setFrameShape(QGraphicsView.Shape.NoFrame)
-    view.setStyleSheet("background: black; border: none;")
-    window.setCentralWidget(view)
+    if DEBUG_MODE == False:
+        # Apply horizontal mirror by wrapping in a graphics view
+        # Get the original central widget and remove it temporarily
+        original_central = window.takeCentralWidget()
+        
+        # Create graphics scene and proxy
+        scene = QGraphicsScene()
+        proxy = QGraphicsProxyWidget()
+        proxy.setWidget(original_central)
+        
+        # Apply horizontal flip transform with proper origin
+        transform = QTransform()
+        transform.translate(480, 0)  # Move to right edge first
+        transform.scale(-1, 1)       # Then flip horizontally
+        proxy.setTransform(transform)
+        
+        scene.addItem(proxy)
+        
+        # Create view and set as new central widget
+        view = QGraphicsView(scene)
+        view.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        view.setFrameShape(QGraphicsView.Shape.NoFrame)
+        view.setStyleSheet("background: black; border: none;")
+        window.setCentralWidget(view)
     
     input_listener.key_pressed.connect(window._handle_input_key)
     window.show()
     window.resize(480, 320)
-    
-    # Fit scene to view
-    scene.setSceneRect(0, 0, 480, 320)
-    view.fitInView(scene.sceneRect(), Qt.AspectRatioMode.IgnoreAspectRatio)
-    
+    if DEBUG_MODE == False:
+        # Set scene rect to exact dimensions and fit to view
+        scene.setSceneRect(0, 0, 480, 320)
+        view.fitInView(scene.sceneRect(), Qt.AspectRatioMode.IgnoreAspectRatio)
+        
+        # Set focus to window so keyboard events work immediately
+        window.setFocus()
+        window.activateWindow()
+        
     print("window: ", window.width(), " ", window.height())
     sys.exit(app.exec())
 
