@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QLabel
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 import threading
+import pygame
 
 import camera
 import ai_client
@@ -18,6 +19,12 @@ class AIPage(QLabel):
         # Connect signal to UI slot
         self.result_ready.connect(self._apply_result)
         self.setText("Blank Page\n\nPress Enter to capture and analyze the camera frame.")
+
+        # Initialize pygame mixer for audio
+        try:
+            pygame.mixer.init()
+        except Exception as e:
+            print(f"Warning: Could not initialize audio: {e}")
 
     def capture_and_analyze(self):
         if self.busy:
@@ -38,6 +45,17 @@ class AIPage(QLabel):
                 cam = camera.get_camera()
                 frame_rgb = cam.capture_raw()
                 desc = ai_client.analyze_frame(frame_rgb)
+
+                # Generate and play audio
+                if desc and not desc.startswith("Error"):
+                    audio_path = ai_client.generate_speech(desc)
+                    if audio_path:
+                        try:
+                            pygame.mixer.music.load(audio_path)
+                            pygame.mixer.music.play()
+                        except Exception as e:
+                            print(f"Audio playback error: {e}")
+
                 # Emit signal to update UI on the main thread
                 self.result_ready.emit(desc)
             except Exception as e:

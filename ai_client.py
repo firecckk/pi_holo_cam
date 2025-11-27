@@ -3,6 +3,7 @@ import base64
 import io
 from typing import Optional
 import time
+from pathlib import Path
 from PIL import Image
 
 # OpenAI Python SDK
@@ -72,3 +73,25 @@ def analyze_frame(frame_rgb) -> str:
     response = resp.choices[0].message.content
     print("Chat GPT responses: ", response)
     return  response or "(No description returned)"
+
+
+def generate_speech(text_input, output_file="response.mp3"):
+    """
+    Converts text to speech using OpenAI's TTS API.
+    """
+    client = _get_client()
+    try:
+        response = client.audio.speech.create(
+            model="tts-1",
+            voice="alloy",
+            input=text_input
+        )
+        
+        # Save the audio to a file
+        speech_file_path = Path(__file__).parent / output_file
+        response.stream_to_file(speech_file_path)
+        return str(speech_file_path)
+        
+    except Exception as e:
+        print(f"Error generating speech: {e}")
+        return None
