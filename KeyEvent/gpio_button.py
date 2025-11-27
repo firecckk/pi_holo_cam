@@ -27,3 +27,30 @@ def gpio_button_init(input_listener):
                          callback=button_callback, 
                          bouncetime=100)
         print(f"GPIO {pin} 已绑定到按键 {key_code}")
+
+def gpio_button_cleanup():
+    """清理 GPIO 按钮资源"""
+    try:
+        # 移除所有事件检测
+        for pin in BUTTON_PINS.keys():
+            GPIO.remove_event_detect(pin)
+            print(f"已移除 GPIO {pin} 的事件检测")
+        
+        # 关闭上拉电阻
+        if 'PULLUP_PIN' in globals():
+            GPIO.output(PULLUP_PIN, GPIO.LOW)
+            GPIO.setup(PULLUP_PIN, GPIO.IN)  # 设置为输入模式避免意外输出
+        
+        # 清理所有GPIO资源
+        GPIO.cleanup()
+        print("GPIO 按钮资源已清理完成")
+        
+    except Exception as e:
+        print(f"清理GPIO时发生错误: {e}")
+    
+    finally:
+        # 确保GPIO被清理
+        try:
+            GPIO.cleanup()
+        except:
+            pass
