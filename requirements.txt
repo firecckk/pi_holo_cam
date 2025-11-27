@@ -1,0 +1,6 @@
+openai
+pygame
+Pillow
+numpy
+opencv-python
+PyQt6
