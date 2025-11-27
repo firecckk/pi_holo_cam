@@ -12,7 +12,7 @@ class AIPage(QLabel):
     result_ready = pyqtSignal(str)
     def __init__(self):
         super().__init__(alignment=Qt.AlignmentFlag.AlignCenter)
-        self.setStyleSheet("background-color: #000000; color: #ECF0F1; font-size: 18px;")
+        self.setStyleSheet("background-color: #000000; color: #ECF0F1; font-size: 24px;")
         self.setWordWrap(True)
         self.busy = False
         self._timeout_timer = None
@@ -44,11 +44,14 @@ class AIPage(QLabel):
                 # Use fast path: no extra color conversions
                 cam = camera.get_camera()
                 frame_rgb = cam.capture_raw()
-                desc = ai_client.analyze_frame(frame_rgb)
+                result = ai_client.analyze_frame(frame_rgb)
+                
+                ui_text = result.get("ui_text", "Error parsing response")
+                speech_text = result.get("speech_text", "")
 
                 # Generate and play audio
-                if desc and not desc.startswith("Error"):
-                    audio_path = ai_client.generate_speech(desc)
+                if speech_text:
+                    audio_path = ai_client.generate_speech(speech_text)
                     if audio_path:
                         try:
                             pygame.mixer.music.load(audio_path)
@@ -57,7 +60,7 @@ class AIPage(QLabel):
                             print(f"Audio playback error: {e}")
 
                 # Emit signal to update UI on the main thread
-                self.result_ready.emit(desc)
+                self.result_ready.emit(ui_text)
             except Exception as e:
                 # Emit error via signal
                 self.result_ready.emit(f"Error: {e}")

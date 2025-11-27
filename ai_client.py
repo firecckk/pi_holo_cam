@@ -1,6 +1,7 @@
 import os
 import base64
 import io
+import json
 from typing import Optional
 import time
 from pathlib import Path
@@ -41,10 +42,11 @@ def _get_client():
     return _client
 
 
-def analyze_frame(frame_rgb) -> str:
+def analyze_frame(frame_rgb) -> dict:
     """Analyze a numpy RGB frame using OpenAI vision and return description text.
 
     - frame_rgb: numpy array in RGB shape (H, W, 3), dtype=uint8
+    Returns a dict: {'ui_text': str, 'speech_text': str}
     """
     client = _get_client()
     # Convert numpy RGB to JPEG base64 (resize to 512x512 for cost/speed)
@@ -54,25 +56,36 @@ def analyze_frame(frame_rgb) -> str:
     img.save(buffer, format="JPEG", quality=85)
     img_b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
-    prompt = "Describe the image concisely."
-
-    # Using chat.completions for vision per existing project style
-    resp = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_b64}"}},
-                ],
-            }
-        ],
+    system_prompt = (
+        "You are HoloCap AI. Analyze the image and return a JSON object with two keys: "
+        "'ui_text' (max 10 words, concise for HUD) and "
+        "'speech_text' (natural, specific but simple, 1-2 sentences for audio)."
     )
 
-    response = resp.choices[0].message.content
-    print("Chat GPT responses: ", response)
-    return  response or "(No description returned)"
+    # Using chat.completions for vision per existing project style
+    try:
+        resp = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "What is in this image?"},
+                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_b64}"}},
+                    ],
+                }
+            ],
+            response_format={"type": "json_object"},
+            max_tokens=150,
+        )
+
+        content = resp.choices[0].message.content
+        print("Chat GPT responses: ", content)
+        return json.loads(content)
+    except Exception as e:
+        print(f"AI Error: {e}")
+        return {"ui_text": f"Error: {e}", "speech_text": ""}
 
 
 def generate_speech(text_input, output_file="response.mp3"):
