@@ -69,4 +69,6 @@ def analyze_frame(frame_rgb) -> str:
         ],
     )
 
-    return resp.choices[0].message.content or "(No description returned)"
+    response = resp.choices[0].message.content
+    print("Chat GPT responses: ", response)
+    return  response or "(No description returned)"
