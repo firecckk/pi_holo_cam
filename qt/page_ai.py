@@ -11,7 +11,7 @@ class AIPage(QLabel):
     result_ready = pyqtSignal(str)
     def __init__(self):
         super().__init__(alignment=Qt.AlignmentFlag.AlignCenter)
-        self.setStyleSheet("background-color: #000000; color: #ECF0F1; font-size: 18px;")
+        self.setStyleSheet("background-color: #000000; color: #ECF0F1; font-size: 24px;")
         self.setWordWrap(True)
         self.busy = False
         self._timeout_timer = None

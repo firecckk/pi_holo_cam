@@ -53,7 +53,7 @@ def analyze_frame(frame_rgb) -> str:
     img.save(buffer, format="JPEG", quality=85)
     img_b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
-    prompt = "Describe the image concisely."
+    prompt = "You are HoloCap AI. Analyze the image and return a short sentence around 15 words, concise for a small HUD display"
 
     # Using chat.completions for vision per existing project style
     resp = client.chat.completions.create(
