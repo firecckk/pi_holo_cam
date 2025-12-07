@@ -10,13 +10,22 @@ import KeyEvent.tcp_button as tcp_button
 # Disable TTY
 # -----------------------------
 def disable_fb_console():
-    os.system("echo 0 | sudo tee /sys/class/vtconsole/vtcon1/bind > /dev/null 2>&1")
+    #os.system("echo 0 | sudo tee /sys/class/vtconsole/vtcon1/bind > /dev/null 2>&1")
+    pass
 
 def enable_fb_console():
-    os.system("echo 1 | sudo tee /sys/class/vtconsole/vtcon1/bind > /dev/null 2>&1")
+    #os.system("echo 1 | sudo tee /sys/class/vtconsole/vtcon1/bind > /dev/null 2>&1")
+    pass
 
-atexit.register(enable_fb_console)
+def graceful_exit(signum, frame):
+    gpio_button.gpio_button_cleanup()
+    enable_fb_console()
+    exit(0)
+
 signal.signal(signal.SIGINT, lambda s, f: exit(0))
+signal.signal(signal.SIGTERM, lambda s, f: exit(0))
+
+atexit.register(graceful_exit)
 
 disable_fb_console()
 
