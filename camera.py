@@ -50,7 +50,7 @@ def init_camera(real = False):
     else:
         from PIL import Image
         # Hardcoded mock image path
-        mock_path = r".\MockCam\test1.png"
+        mock_path = os.path.join(".", "MockCam", "test1.png")
         
         class MockCamera:
             def __init__(self, width=320, height=320):
