@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QLabel
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 import threading
+import pygame
 
 import camera
 import ai_client
@@ -11,13 +12,19 @@ class AIPage(QLabel):
     result_ready = pyqtSignal(str)
     def __init__(self):
         super().__init__(alignment=Qt.AlignmentFlag.AlignCenter)
-        self.setStyleSheet("background-color: #000000; color: #ECF0F1; font-size: 24px;")
+        self.setStyleSheet("background-color: #000000; color: #ECF0F1; font-size: 26px;")
         self.setWordWrap(True)
         self.busy = False
         self._timeout_timer = None
         # Connect signal to UI slot
         self.result_ready.connect(self._apply_result)
         self.setText("Blank Page\n\nPress Enter to capture and analyze the camera frame.")
+
+        # Initialize pygame mixer for audio
+        try:
+            pygame.mixer.init()
+        except Exception as e:
+            print(f"Warning: Could not initialize audio: {e}")
 
     def capture_and_analyze(self):
         if self.busy:
@@ -37,9 +44,23 @@ class AIPage(QLabel):
                 # Use fast path: no extra color conversions
                 cam = camera.get_camera()
                 frame_rgb = cam.capture_raw()
-                desc = ai_client.analyze_frame(frame_rgb)
+                result = ai_client.analyze_frame(frame_rgb)
+                
+                ui_text = result.get("ui_text", "Error parsing response")
+                speech_text = result.get("speech_text", "")
+
+                # Generate and play audio
+                if speech_text:
+                    audio_path = ai_client.generate_speech(speech_text)
+                    if audio_path:
+                        try:
+                            pygame.mixer.music.load(audio_path)
+                            pygame.mixer.music.play()
+                        except Exception as e:
+                            print(f"Audio playback error: {e}")
+
                 # Emit signal to update UI on the main thread
-                self.result_ready.emit(desc)
+                self.result_ready.emit(ui_text)
             except Exception as e:
                 # Emit error via signal
                 self.result_ready.emit(f"Error: {e}")
