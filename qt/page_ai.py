@@ -39,14 +39,15 @@ class AIPage(QLabel):
                 frame_rgb = cam.capture_raw()
                 result = ai_client.analyze_frame(frame_rgb)
                 
+                # Emit signal to update UI on the main thread
                 ui_text = result.get("ui_text", "Error parsing response")
+                self.result_ready.emit(ui_text)
+
                 speech_text = result.get("speech_text", "")
 
                 if speech_text:
                     ai_client.stream_tts_and_play(speech_text)
 
-                # Emit signal to update UI on the main thread
-                self.result_ready.emit(ui_text)
             except Exception as e:
                 # Emit error via signal
                 self.result_ready.emit(f"Error: {e}")

@@ -151,8 +151,8 @@ class MainApplication(QMainWindow):
         self.stacked_widget = AnimatedStackedWidget()
         
         # 添加内容页面
-        pages = [MapPage(), AIPage(), CameraPage()]
-        for page in pages:
+        self.pages = [MapPage(), AIPage(), CameraPage()]
+        for page in self.pages:
             self.stacked_widget.addWidget(page)
             
         #for i, (name, _) in enumerate(items_data):
@@ -213,11 +213,22 @@ class MainApplication(QMainWindow):
         # 调用父类的 keyPressEvent 以处理其他默认按键行为
         super().keyPressEvent(event)
 
+    def CMDEvent(self, cmd_code):
+        if cmd_code in range(1, 4):
+            '''page index 0-2'''
+            self.menu_list.setCurrentRow(cmd_code-1)
+        if cmd_code == 4:
+            ai_page = self.pages[1]
+            if isinstance(ai_page, AIPage):
+                ai_page.capture_and_analyze()
+
+
 def run(input_listener):
     app = QApplication(sys.argv)
     app.setOverrideCursor(QCursor(Qt.CursorShape.BlankCursor))
     window = MainApplication()
     input_listener.key_pressed.connect(window._handle_input_key)
+    input_listener.cmd_event.connect(window.CMDEvent)
     window.show()
     window.resize(480, 320)
     print("window: ", window.width(), " ", window.height())
