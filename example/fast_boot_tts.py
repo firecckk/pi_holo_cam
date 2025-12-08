@@ -1,8 +1,7 @@
 import pyaudio
 from openai import OpenAI
-from .. import config
 
-client = OpenAI(api_key=config.API_KEY)
+from client import client
 
 def stream_tts_and_play(text):
     # streaming TTS
@@ -21,7 +20,7 @@ def stream_tts_and_play(text):
             output=True,
         )
 
-        # 🔥 缓冲区：避免首包不完整导致的杂音
+        # 缓冲区：避免首包不完整导致的杂音
         buffer = bytearray()
 
         for chunk in response.iter_bytes():

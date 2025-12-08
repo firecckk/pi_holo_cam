@@ -105,7 +105,7 @@ def stream_tts_and_play(text):
             output=True,
         )
 
-        # 🔥 缓冲区：避免首包不完整导致的杂音
+        # 缓冲区：避免首包不完整导致的杂音
         buffer = bytearray()
 
         for chunk in response.iter_bytes():
