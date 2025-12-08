@@ -14,9 +14,9 @@ def get_camera():
         init_camera(False)
     return __camera
 
-def init_camera(real = False):
+def init_camera(use_real_cam = False):
     global __camera, __camera_inited
-    if real:
+    if use_real_cam:
         from picamera2 import Picamera2
         from libcamera import Transform
         import cv2
