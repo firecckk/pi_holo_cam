@@ -6,6 +6,7 @@ from typing import Optional
 import time
 from pathlib import Path
 from PIL import Image
+import pyaudio
 
 # OpenAI Python SDK
 try:
@@ -25,10 +26,9 @@ _client = None  # lazily initialized OpenAI client instance
 
 def _get_client():
     global _client
-    if _client is not None:
+    if _client is None:
         print("_client is none")
         time.sleep(0.7)
-        return _client
     if OpenAI is None:
         print("OpenAI package not available")
         time.sleep(0.7)
@@ -87,24 +87,45 @@ def analyze_frame(frame_rgb) -> dict:
         print(f"AI Error: {e}")
         return {"ui_text": f"Error: {e}", "speech_text": ""}
 
-
-def generate_speech(text_input, output_file="response.mp3"):
-    """
-    Converts text to speech using OpenAI's TTS API.
-    """
+def stream_tts_and_play(text):
     client = _get_client()
-    try:
-        response = client.audio.speech.create(
-            model="tts-1",
-            voice="alloy",
-            input=text_input
+    # streaming TTS
+    with client.audio.speech.with_streaming_response.create(
+        model="gpt-4o-mini-tts",
+        voice="alloy",
+        input=text,
+        response_format="pcm",
+    ) as response:
+
+        pa = pyaudio.PyAudio()
+        stream = pa.open(
+            format=pyaudio.paInt16,
+            channels=1,
+            rate=24000,
+            output=True,
         )
-        
-        # Save the audio to a file
-        speech_file_path = Path(__file__).parent / output_file
-        response.stream_to_file(speech_file_path)
-        return str(speech_file_path)
-        
-    except Exception as e:
-        print(f"Error generating speech: {e}")
-        return None
+
+        # 🔥 缓冲区：避免首包不完整导致的杂音
+        buffer = bytearray()
+
+        for chunk in response.iter_bytes():
+
+            buffer.extend(chunk)
+
+            # 如果 buffer 太小，不播放（防止不完整 PCM 帧）
+            if len(buffer) < 512:    # 约 10ms 音频
+                continue
+
+            # 保证 16-bit 对齐（偶数字节）
+            playable_size = len(buffer) - (len(buffer) % 2)
+            if playable_size > 0:
+                stream.write(bytes(buffer[:playable_size]))
+                del buffer[:playable_size]
+
+        # 播放剩余数据
+        if len(buffer) > 0:
+            stream.write(bytes(buffer))
+
+        stream.stop_stream()
+        stream.close()
+        pa.terminate()
